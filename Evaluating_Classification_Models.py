@@ -197,4 +197,91 @@ weighted avg       0.97      0.97      0.97       171
 
 # Plot the confusion matrices
 
+conf_matrix_knn = confusion_matrix(y_test, y_pred_knn)
+conf_matrix_svm = confusion_matrix(y_test, y_pred_svm)
+
+# Create a 12×5 inch figure with 2 plots arranged side-by-side, where fig represents the whole figure and axes[0] and axes[1] represent the two individual plots.
+fig, axes = plt.subplot(1, 2, figsize = (12, 5))
+
+sns.heatmap(conf_matrix_knn, annot = True ,cmap = "Blues", ax = axes[0], fmt='d', xticklabels = labels, yticklabels = labels) # labels = data.target_names from above
+axes[0].set_title("KNN testing confusion matrix")
+axes[0].set_xlabel("Predicted")
+axes[0].set_ylabel("Actual")
+
+
+sns.heatmap(conf_matrix_svm, annot = True, cmap = "Blues", ax = axes[1], fmt='d', xticklabels = labels, yticklabels = labels)
+axes[1].set_title("SVM testing confusion matrix")
+axes[1].set_xlabel("Predicted")
+axes[1].set_ylabel("Actual")
+
+plt.tight_layout()
+plt.show()
+
+"""
+Are we overfitting?¶
+Let's evaluate the results on the training data and compare them against the test data results.
+
+Exercise 4. Obtain the prediction results using the training data.
+"""
+
+y_pred_train_knn = knn.predict(X_train)
+y_pred_train_svm = svm.predict(X_train)
+
+# Evaluate the models on the training data
+print(f"KNN Training Accuracy: {accuracy_score(y_train, y_pred_train_knn):.3f}")
+print(f"SVM Training Accuracy: {accuracy_score(y_train, y_pred_train_svm):.3f}")
+
+print("\nKNN Training Classification Report:")
+print(classification_report(y_train, y_pred_train_knn))
+
+print("\nSVM Training Classification Report:")
+print(classification_report(y_train, y_pred_train_svm))
+
+"""
+KNN Training Accuracy: 0.955
+SVM Training Accuracy: 0.972
+
+KNN Training Classification Report:
+              precision    recall  f1-score   support
+
+           0       0.96      0.91      0.94       149
+           1       0.95      0.98      0.96       249
+
+    accuracy                           0.95       398
+   macro avg       0.96      0.95      0.95       398
+weighted avg       0.96      0.95      0.95       398
+
+
+SVM Training Classification Report:
+              precision    recall  f1-score   support
+
+           0       0.98      0.95      0.96       149
+           1       0.97      0.99      0.98       249
+
+    accuracy                           0.97       398
+   macro avg       0.97      0.97      0.97       398
+weighted avg       0.97      0.97      0.97       398
+"""
+
+# Exercise 5. Plot the confusion matrices for the training data
+
+# Enter your code here
+conf_matrix_knn = confusion_matrix(y_train, y_pred_train_knn)
+conf_matrix_svm = confusion_matrix(y_train, y_pred_train_svm)
+
+fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+sns.heatmap(conf_matrix_knn, annot=True, cmap='Blues', fmt='d', ax=axes[0], xticklabels=labels, yticklabels=labels)
+
+axes[0].set_title('KNN Training Confusion Matrix')
+axes[0].set_xlabel('Predicted')
+axes[0].set_ylabel('Actual')
+
+sns.heatmap(conf_matrix_svm, annot=True, cmap='Blues', fmt='d', ax=axes[1],
+            xticklabels=labels, yticklabels=labels)
+axes[1].set_title('SVM Training Confusion Matrix')
+axes[1].set_xlabel('Predicted')
+axes[1].set_ylabel('Actual')
+
+plt.tight_layout()
+plt.show()
 
