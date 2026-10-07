@@ -81,3 +81,46 @@ Visualizing the noise content.
 You can get a good idea of how much noise there is in the features by comparing values in the previous tables.
 You can also visualize the differences in several ways. Let's begin by plotting the histograms of one of the features with and without noise for comparison.
 """
+
+plt.figure(figsize=(12,6))
+
+# Original Feature Distribution (Noise-Free)
+plt.subplot(1,2,1)
+plt.hist(df[feature_names[5]], bins = 20, alpha = 0.7, color='blue', label = "X_scaled: original ") # or df["mean compactness"]
+plt.xlabel(feature_names[5]) #  mean compactness
+plt.ylabel("Frequency")
+
+# Noisy Feature Distribution
+plt.subplot(1,2,2)
+plt.hist(df_noisy[feature_name[5]], bins = 20, alpha=0.7, color= 'red', label = "X_noisy")
+plt.xlabel(feature_names[5]) #  mean compactness
+plt.ylabel("Frequency")
+
+plt.tight_layout() # Ensures proper spacing between subplots
+plt.show()
+
+"""
+Plots
+You can also plot the two features together to get a sense of their differences.
+"""
+
+plt.figure( figsize = (12,6))
+plt.plot(df["mean compactness"], label="Original" , lw =3) # line width = 3
+plt.plot(df_noisy["mean compactness"], label="Noisy", '--')
+plt.title("Scaled feature comparison with and without noise")
+plt.xlabel("mean compactness")
+plt.legend()
+plt.show()
+
+"""
+Scatterplot
+Finally, you can compare the two features using a scatterplot. This gives you an excellent idea of how well the two features are correlated.
+"""
+
+plt.figure(figsize=(12,6))
+plt.scatter(df["mean compactness"],df_noisy["mean compactness"] , lw=5 ) # line width = 5
+plt.title("Scaled feature comparison with and without noise")
+plt.xlabel("original")
+plt.ylabel("Noisy")
+plt.tight_layout()
+plt.show()
