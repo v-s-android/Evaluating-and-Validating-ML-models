@@ -62,3 +62,22 @@ scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X) 
 
 # Add some noise
+# Next, add some noise to simulate random measurement error, then view the first few rows of the original and noisy features for comparison.
+# Add Gaussian noise to the data set
+np.random.seed(42)
+noise_factor = 0.5
+X_noisy = X_scaled + noise_factor * np.random.normal(loc = 0.0, scale = 1.0, size = X.shape )
+
+# Load the original and noisy data sets into a DataFrame for comparison and visualization
+df = pd.DataFrame(X_scaled , columns = feature_names)
+df_noisy = pd.DataFrame(X_noisy , columns = feature_names)
+
+print(df.head())
+
+print(df_noisy.head())
+
+"""
+Visualizing the noise content.
+You can get a good idea of how much noise there is in the features by comparing values in the previous tables.
+You can also visualize the differences in several ways. Let's begin by plotting the histograms of one of the features with and without noise for comparison.
+"""
