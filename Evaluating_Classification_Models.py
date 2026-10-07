@@ -124,3 +124,77 @@ plt.xlabel("original")
 plt.ylabel("Noisy")
 plt.tight_layout()
 plt.show()
+
+### Exercise 1. Split the data, and fit the KNN and SVM models to the noisy training data
+
+X_train, X_test, y_train, y_test = train_test_split(X_noisy, y , test_size = 0.3, random_state = 42) # from data = load_breast_cancer() X, y = data.data, data.target
+
+knn = KNeighborsClassifier(n_neighbors = 5)
+svm = SVC(kernel = 'linear', C=1, random_state = 42)
+
+knn.fit(X_train, y_train)
+svm.fit(X_train, y_train)
+
+"""
+Evaluate the models
+Predict on the test set
+"""
+
+y_pred_knn = knn.predict(X_test)
+print("y_pred_knn", y_pred_knn)
+y_pred_svm = svm.predict(X_test)
+print("y_pred_svm", y_pred_svm)
+
+"""
+y_pred_knn [1 0 0 1 1 0 0 0 1 1 1 0 1 0 1 0 1 1 1 0 1 1 0 1 1 1 1 1 1 0 1 1 1 1 1 1 0
+ 1 0 0 1 0 1 1 1 1 1 1 1 1 0 0 0 1 1 1 1 0 0 1 1 0 0 1 1 1 0 0 1 1 1 0 1 0
+ 1 1 0 1 1 1 0 1 1 0 0 0 0 0 1 1 1 0 1 1 1 1 0 0 1 0 0 1 0 0 1 1 1 0 1 1 0
+ 1 1 0 1 0 1 1 1 0 1 1 1 0 1 0 0 1 1 0 0 0 1 1 1 0 1 1 1 0 1 0 1 1 0 1 0 0
+ 1 1 1 1 1 1 1 0 0 1 1 1 1 1 1 1 1 1 1 1 1 0 1]
+y_pred_svm [1 0 0 1 1 0 0 0 1 1 1 0 1 0 1 0 1 1 1 0 1 1 0 1 1 1 1 1 1 0 1 1 1 1 1 1 0
+ 1 0 1 1 0 1 1 1 1 1 1 1 1 0 0 0 0 1 1 1 0 1 1 1 0 0 1 1 1 0 0 1 1 0 0 1 0
+ 1 1 1 0 1 1 0 1 0 0 0 0 0 0 1 1 1 1 1 1 1 1 0 0 1 0 0 1 0 0 1 1 1 0 0 1 0
+ 1 1 0 1 0 1 1 1 0 1 1 1 0 1 0 0 1 1 0 0 0 1 1 1 0 1 1 1 0 1 0 1 1 0 1 0 0
+ 0 1 0 1 1 1 1 0 0 1 1 1 1 1 1 1 0 1 1 1 1 0 1]
+"""
+
+# Print the accuracy scores and classification reports for both models¶
+
+print(f"KNN Testing Accuracy: {accuracy_score(y_test, y_pred_knn):.3f}")
+print(f"SVM Testing Accuracy: {accuracy_score(y_test, y_pred_svm):.3f}")
+
+print("\nKNN Testing Data Classification Report:")
+print(classification_report(y_test, y_pred_knn))
+
+print("\nSVM Testing Data Classification Report:")
+print(classification_report(y_test, y_pred_svm))
+
+"""
+KNN Testing Accuracy: 0.936
+SVM Testing Accuracy: 0.971
+
+KNN Testing Data Classification Report:
+              precision    recall  f1-score   support
+
+           0       0.93      0.89      0.91        63
+           1       0.94      0.96      0.95       108
+
+    accuracy                           0.94       171
+   macro avg       0.94      0.93      0.93       171
+weighted avg       0.94      0.94      0.94       171
+
+
+SVM Testing Data Classification Report:
+              precision    recall  f1-score   support
+
+           0       0.95      0.97      0.96        63
+           1       0.98      0.97      0.98       108
+
+    accuracy                           0.97       171
+   macro avg       0.97      0.97      0.97       171
+weighted avg       0.97      0.97      0.97       171
+"""
+
+# Plot the confusion matrices
+
+
