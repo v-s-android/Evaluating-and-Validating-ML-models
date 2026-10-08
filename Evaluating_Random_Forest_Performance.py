@@ -118,9 +118,92 @@ These statistics alone don't explain any details about the performance of the mo
 
 # Plot Actual vs Predicted values
 
-plt.scatter(y_test, y_pred_test, color = 'blue', alpha = 0.5)
-plt.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 'k--', lw=2)
+plt.scatter(y_test, y_pred_test, color = 'blue', alpha = 0.5) # This code is used to compare the actual target values (y_test) with the model's predicted values (y_pred_test).
+plt.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 'k--', lw=2) # A true perfect-prediction reference line, K= black, -- = dash line
 plt.xlabel("Acutal values")
 plt.ylabel("Predicted values")
 plt.title("Random Forest Regression - Actual vs Predicted")
 plt.show()
+
+"""
+Exercise 4. Plot the histogram of the residual errors (dollars)
+Also, print the mean and standard deviation of the residuals. Check for any patterns.
+"""
+residuals = 1e5 * (y_test - y_pred_test) #calculates the residuals (prediction errors) of your model 
+
+"""
+y_test: Actual values from your test dataset.
+
+y_pred_test: Values predicted by your model.
+
+y_test - y_pred_test: Calculates the prediction error for each observation.
+
+1e5: Means 1×10^5 =100,000. It multiplies each residual by 100,000 to make the values easier to view on the chosen scale.
+"""
+
+# plot the histogram of the residuals
+plt.hist(residuals, bins = 30, color = 'lightblue', edgecolor = 'black')
+plt.title("Median House Value Prediction Residuals")
+plt.xlabel("Median House Value Prediction Error ($)")
+plt.ylabel("Frequency")
+plt.show()
+
+print("Average error(mean of residuals): ",str(int(np.mean(residuals))))
+print("Standard deviation of error: ", str(int(np.std(residuals))))
+"""
+Average error = -1215
+Standard deviation of error = 50537
+"""
+
+"""
+Exercise 5. Plot the model residual errors by median house value.
+Sort the residuals by actual median house value before plotting the residuals.
+
+Check for any patterns.
+"""
+
+# Create a DataFrame to make sorting easy
+residuals_df = pd.DataFrame({ 'Actual' : 1e5 * y_test, 'Residuals': residuals })
+print(residuals_df.head())
+# Sort the DataFrame by the actual target values
+residuals_df = residuals_df.sort_values( by = 'Actual')
+
+# Plot the residuals
+plt.scatter(residuals_df['Actual'], residuals_df['Residuals'], alpha = 0.5, ec='k' ) # k is black, marker = 'o',
+plt.title('Median House Value Prediciton Residuals Ordered by Actual Median Prices')
+plt.xlabel('Actual Values (Sorted)')
+plt.ylabel('Residuals')
+plt.grid(True)
+plt.show()
+
+""" residuals_df
+     Actual  Residuals
+0   47700.0   -3245.00
+1   45800.0  -28705.00
+2  500001.0    7675.29
+3  218600.0  -34246.00
+4  278000.0   50097.00
+"""
+
+### Exercise 6. What trend can you infer from this residual plot?
+""" Although we saw a small average residual of only -$1400, you can see from this plot that the average error as a function of median house price is actually increasing
+from negative to positive values. In other words, lower median prices tend to be overpredicted while higher median prices tend to be underpredicted."""
+
+"""
+Exercise 7. Display the feature importances as a bar chart.
+Do you think these feature weights have practial significance? Are any of the features possibly sharing importance with other correlated features?
+"""
+
+# Feature importances
+importances = rf_regressor.feature_importances_
+indices = np.argsort(importances)[::-1]
+features = data.feature_names
+
+# Plot feature importances
+plt.bar(range(X.shape[1]), importances[indices],  align="center")
+plt.xticks(range(X.shape[1]), [features[i] for i in indices], rotation=45)
+plt.xlabel("Feature")
+plt.ylabel("Importance")
+plt.title("Feature Importances in Random Forest Regression")
+plt.show()
+
