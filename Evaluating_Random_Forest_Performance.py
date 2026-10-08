@@ -97,3 +97,21 @@ Mean Squared Error (MSE): 0.2556
 Root Mean Squared Error (RMSE): 0.5055
 R² Score: 0.8050
 """
+
+"""
+Exercise 3. What do these statistics mean to you?
+How comfortable could you be with stopping here and communicating the results to the C-suite?
+
+Answer: 
+The mean absolute error is $33,220.
+
+So, on average, predicted median house prices are off by $33k.
+
+Mean squared error is less intuitive to interpret, but is usually what is being minimized by the model fit.
+On the other hand, taking the square root of MSE yields a dollar value, here RMSE = $50,630.
+
+An R-squared score of 0.80 is not considered very high. It means the model explains about %80 of the variance in median house prices,
+although this interpretation can be misleading for compex data with nonlinear relationships, skewed values, and outliers. R-squard can still be useful for comparing models though.
+
+These statistics alone don't explain any details about the performance of the model. For example, where did the model do well or poorly?
+"""
