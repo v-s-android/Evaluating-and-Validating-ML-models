@@ -115,3 +115,12 @@ although this interpretation can be misleading for compex data with nonlinear re
 
 These statistics alone don't explain any details about the performance of the model. For example, where did the model do well or poorly?
 """
+
+# Plot Actual vs Predicted values
+
+plt.scatter(y_test, y_pred_test, color = 'blue', alpha = 0.5)
+plt.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 'k--', lw=2)
+plt.xlabel("Acutal values")
+plt.ylabel("Predicted values")
+plt.title("Random Forest Regression - Actual vs Predicted")
+plt.show()
