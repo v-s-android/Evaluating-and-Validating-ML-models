@@ -103,8 +103,8 @@ colormap = cm.tab10
 # Plot the blobs
 plt.figure(figsize=(18, 6))
 plt.subplot(1, 3, 1)
-plt.scatter(X[:, 0], X[:, 1], s=50, alpha=0.6, edgecolor='k') # n_features=2 - Each data point has 2 features (coordinates), useful for 2D plotting.
-centers = kmeans.cluster_centers_
+plt.scatter(X[:, 0], X[:, 1], s=50, alpha=0.6, edgecolor='k') # n_features=2 - Each data point has 2 features (coordinates), useful for 2D plotting. s=50 -> Sets the marker size to 50.
+centers = kmeans.cluster_centers_ # Retrieves the coordinates of the center (centroid) of each cluster.
 plt.scatter(centers[:, 0], centers[:, 1], c='red', s=200, marker='X', alpha=0.9, label='Centroids')
 plt.title(f'Synthetic Blobs with {n_clusters} Clusters')
 plt.xlabel('Feature 1')
@@ -145,3 +145,216 @@ plt.subplot(1, 3, 3)
 evaluate_clustering(X, y_kmeans, n_clusters, title_suffix=' k-Means Clustering')
 plt.show()
 
+"""
+Cluster Stability
+How do the results change when K-means is run using different initial centroid seeds?
+
+To assess stability, we can measure inertia and repeatedly vary the random initialization of cluster centers to observe the impact of having different intitial centroid locations.
+
+Inertia measures the compactness of clusters in K-means. It is defined as the sum of squared distances between each data point and its cluster centroid. Lower inertia values indicate more
+compact clusters and a potentially better clustering outcome. However, inertia tends to decrease as the number of clusters increases, so it's important to interpret it alongside other metrics.
+
+To evaluate the stability of clustering, running k-means multiple times with different initial centroids by not fixing the random state helps determine if the algorithm consistently produces
+similar cluster assignments and inertia scores. Consistent inertia across runs suggests a stable solution that is less dependent on initial centroid positions.
+"""
+
+# Number of runs for k-means with different random states
+n_runs = 8
+inertia_values = []
+
+# Calculate number of rows and columns needed for subplots
+n_cols = 2 # Number of columns
+n_rows = -(-n_runs // n_cols) # Ceil division to determine rows
+
+plt.figure(figsize = (16, 16))
+
+# Run K-Means multiple times with different random states
+for i in range(n_runs):
+    kmeans = KMeans(n_clusters = 4, random_state = None)
+    kmeans.fit(X)
+    inertia_values.append(kmeans.inertia_) # adds inertia values for each run into array
+    # Plot the clustering result
+    plt.subplot(n_rows, n_cols, i+1) # row, colm , position
+    plt.scatter(X[:0], X[:1], c = kmeans.labels_, cmap='tab10', ec = 'k', alpha = 0.6)
+    plt.scatter(kmeans.cluster_centers_[:0], kmeans.cluster_centers_[:1], c= 'red', s= 200, marker = 'x', label = 'Centroids')
+    plt.title(f'K-means Run {i+1}') # 1, 2 ,3...8
+    plt.xlabel('Feature 1')
+    plt.ylabel('Feature 2')
+    plt.legend(loc = 'upper right', fontsize = 'small')
+
+plt.tight_layout()
+plt.show()
+
+# Print inertia values
+for i , inertia in enumerate(inertia_values , start = 1):
+    print(f'For {i} run : Inertia= {inertia:.2f}')
+
+"""
+Run 1: Inertia=7633.51
+Run 2: Inertia=7633.51
+Run 3: Inertia=7633.51
+Run 4: Inertia=7633.51
+Run 5: Inertia=7633.51
+Run 6: Inertia=8556.67
+Run 7: Inertia=7633.51
+Run 8: Inertia=7633.51
+"""
+
+# Exercise 1. What can you say about this result?
+"""
+As demonstrated by the clustering results, the cluster assignments vary between runs when using different initial centroid seeds. Additionally,
+the inertia values show inconsistency, indicating that the clustering process is sensitive to the initial placement of centroids. This inertial inconsistency implies an
+less reliable result.
+"""
+# Range of k values to test
+k_values = range(2,11)
+
+# Store performance metrics
+inertia_values = []
+silhouette_scores = []
+davies_bouldin_indices = []
+
+for k in k_values:
+    kmeans = KMeans(n_clusters = k, random_state = 42)
+    y_kmeans = kmeans.fit_predict(X)
+
+    # Calculate and store metrics
+    inertia_values.append(kmeans.inertia_) # new inertia value for every cluster
+    silhouette_scores.append(silhouette_score(X, y_kmeans))# new silhouette_score value for every cluster
+    davies_bouldin_indices.append(davies_bouldin_score(X, y_kmeans)) # new davies_bouldin_score value for every cluster
+
+
+plt.figure(figsize = (18, 6))
+
+# Plot the inertia values (Elbow Method)
+plt.subplot(1,3,1)
+plt.plot(k_values, inertia , marker = 'o')
+plt.title('k vs Inertia')
+plt.xlabel('Number of clusters (k)')
+plt.ylabel('inertia')
+
+plt.subplot(1,3,2)
+plt.plot(k_values, silhouette_scores, marker = 'o' )
+plt.title('k vs silhouette scores')
+plt.xlabel('Number of clusters (k)')
+plt.ylabel('silhouette scores')
+
+plt.subplot(1,3,3)
+plt.plot(k_values, davies_bouldin_indices, marker = 'o')
+plt.title('K vs davies bouldin indices')
+plt.xlabel('Number of clusters (k)')
+plt.ylabel('davies bouldin indices')
+
+plt.tight_layput()
+plt.show()
+
+"""
+Exercise 2. What do these results suggest to you?
+A)The first plot is often used in the 'elbow method,' where the ideal value of k is chosen near the point where the curve starts to level off. Since inertia decreases as the number of clusters increases,
+it’s important to find the balance where adding more clusters provides diminishing returns in reducing inertia.
+The inertia plot points to an optimal cluster number around 3 or 4. The silhouette score shows a clear peak at k = 3, while the Davies-Bouldin index reaches its lowest values between k = 3 and k = 4.
+
+Overall, these metrics suggest that three clusters may be optimal, although we know that the true number of clusters in this case is actually four.
+"""
+
+# Exercise 3. Plot the blobs and the clustering results for k = 3, 4, and 5
+
+from sklearn.cluster import KMeans
+import matplotlib.pyplot as plt
+import matplotlib.cm as cm
+import numpy as np
+
+plt.figure(figsize=(18, 12))
+colormap = cm.tab10
+
+for i, k in enumerate([2, 3, 4]):
+    # Fit KMeans and predict the labels
+    kmeans = KMeans(n_clusters=k, random_state=42)  # Replace '...' with k
+    y_kmeans = kmeans.fit_predict(X)               # Replace '...' with X
+
+    # Create colors based on the predicted labels
+    colors = colormap(y_kmeans.astype(float) / k)
+
+    # Scatter plot for each k in the first row
+    ax1 = plt.subplot(2, 3, i + 1)
+    ax1.scatter(X[:, 0], X[:, 1], c=colors, s=50, alpha=0.6, edgecolor='k') # scatter plot 
+    ax1.scatter(kmeans.cluster_centers_[:, 0], kmeans.cluster_centers_[:, 1],  c='red', s=200, marker='X', label='Centroids') # plot centers
+
+    # Draw white circles at cluster centers
+    centers = kmeans.cluster_centers_
+    ax1.scatter( centers[:, 0], centers[:, 1], marker="o", c="white", alpha=1, s=200, edgecolor="k" )
+
+    # Label clusters with numbers
+    for idx, c in enumerate(centers):
+        ax1.scatter(c[0], c[1], marker=f"${idx}$", alpha=1, s=50, edgecolor="k")
+
+    ax1.set_title(f'K-Means Clustering Results, k={k}')
+    ax1.set_xlabel('Feature 1')
+    ax1.set_ylabel('Feature 2')
+    ax1.legend()
+
+    # Silhouette plot for each k in the second row
+    ax2 = plt.subplot(2, 3, i + 4)
+    evaluate_clustering(X, y_kmeans, k, ax=ax2, title_suffix=f' k={k}') # calling the function at the top
+
+plt.tight_layout()
+plt.show()
+
+"""
+Limitations of k-means - Shape sensitivity
+Can you identify situations where K-means would not be appropriate? What alternatives could be used?
+
+Let's explore these questions with an experiment. Using make_classification we'll create a labelled, 2-d dataset cosisting of three classes.
+This time we'll have differently shaped sets of points in each class, not just spherical blobs.
+"""
+# Generate synthetic classification data
+X, y_true = make_classification(n_samples=300, n_features=2, n_informative=2, n_redundant=0,
+                                n_clusters_per_class=1, n_classes=3, random_state=42)
+
+# Apply K-Means clustering
+kmeans = KMeans(n_clusters=3, random_state=42)
+y_kmeans = kmeans.fit_predict(X)
+centroids = kmeans.cluster_centers_
+
+# Compute the Voronoi diagram
+vor = Voronoi(centroids)
+
+# Create a 2x2 grid of subplots
+fig, axes = plt.subplots(2, 2, figsize=(14, 10))
+
+# Get consistent axis limits for all scatter plots
+x_min, x_max = X[:, 0].min() - 1, X[:, 0].max() + 1
+y_min, y_max = X[:, 1].min() - 1, X[:, 1].max() + 1
+
+# Plot the true labels with Voronoi regions
+colormap = cm.tab10
+colors_true = colormap(y_true.astype(float) / 3)
+axes[0, 0].scatter(X[:, 0], X[:, 1], c=colors_true, s=50, alpha=0.5, ec='k')
+voronoi_plot_2d(vor, ax=axes[0, 0], show_vertices=False, line_colors='red', line_width=2, line_alpha=0.6, point_size=2)
+axes[0, 0].set_title('Labelled Classification Data with Voronoi Regions')
+axes[0, 0].set_xlabel('Feature 1')
+axes[0, 0].set_ylabel('Feature 2')
+axes[0, 0].set_xlim(x_min, x_max)
+axes[0, 0].set_ylim(y_min, y_max)
+
+# Call evaluate_clustering for true labels
+evaluate_clustering(X, y_true, n_clusters=3, ax=axes[1, 0], title_suffix=' True Labels')
+
+# Plot K-Means clustering results with Voronoi regions
+colors_kmeans = colormap(y_kmeans.astype(float) / 3)
+axes[0, 1].scatter(X[:, 0], X[:, 1], c=colors_kmeans, s=50, alpha=0.5, ec='k')
+axes[0, 1].scatter(centroids[:, 0], centroids[:, 1], c='red', s=200, marker='x', label='Centroids')
+voronoi_plot_2d(vor, ax=axes[0, 1], show_vertices=False, line_colors='red', line_width=2, line_alpha=0.6, point_size=2)
+
+axes[0, 1].set_title('K-Means Clustering with Voronoi Regions')
+axes[0, 1].set_xlabel('Feature 1')
+axes[0, 1].set_ylabel('Feature 2')
+axes[0, 1].set_xlim(x_min, x_max)
+axes[0, 1].set_ylim(y_min, y_max)
+
+# Call evaluate_clustering for K-Means labels
+evaluate_clustering(X, y_kmeans, n_clusters=3, ax=axes[1, 1], title_suffix=' K-Means Clustering')
+
+# Adjust layout and show plot
+plt.tight_layout()
+plt.show()
